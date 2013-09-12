@@ -1,0 +1,62 @@
+$.keyboard ={
+	en:{
+		1:['`',{number:'1'},{number:'2'},{number:'3'},{number:'4'},{number:'5'},{number:'6'},{number:'7'},{number:'8'},{number:'9'},{number:'0'},{simbol:'-'},{backspace:'backspace'}],
+		2:[{simbol:'"'},'q','w','e','r','t','y','u','i','o','p','','',{enter:'enter'}],
+		3:[{simbol:'/'},{simbol:';'},'a','s','d','f','g','h','j','k','l','',''],
+		4:[{shift:'shift'},'z','x','c','v','b','n','m','','',{simbol:"_"},{delete:"delete"}],
+		5:[{lang:'lang'},{simbol:'@'},{space:" "},{simbol:'.'},{simbol:','},{simbol:'<'},{simbol:'>'}]
+	},
+	ru:{
+		1:['ё',{number:'1'},{number:'2'},{number:'3'},{number:'4'},{number:'5'},{number:'6'},{number:'7'},{number:'8'},{number:'9'},{number:'0'},{simbol:'-'},{backspace:'backspace'}],
+		2:[{simbol:'"'},'й','ц','у','к','е','н','г','ш','щ','з','х','ъ',{enter:'enter'}],
+		3:[{simbol:'/'},{simbol:';'},'ф','ы','в','а','п','р','о','л','д','ж','э'],
+		4:[{shift:'shift'},'я','ч','с','м','и','т','ь','б','ю',{simbol:"_"},{delete:"delete"}],
+		5:[{lang:'lang'},{simbol:'@'},{space:" "},{simbol:'.'},{simbol:','},{simbol:'<'},{simbol:'>'}]
+	}
+};
+(function($,undefined){
+	var methods = {
+		build:function(){
+			var o=this.data('keyboard'),display='',key,i=0,name='',d;
+			for(var c in $.keyboard[o.lang])
+				$.keyboard[o.lang][c].forEach(function(b){
+					typeof b == "object"?(key = Object.keys(b),name=b[key]):(key='button',name=b)
+					d=o.disabled[o.lang]&&o.disabled[o.lang][c]&&~o.disabled[o.lang][c].indexOf(i),!o.showDisabled&&d?'':display+='<div class="'+key+(d?' disabled':'')+'">'+name+'</div>',++i		
+				}),i=0
+			return $(o.selector).children('div').html(display),this;
+		},
+		lang:function(n){
+			var o=this.data('keyboard');
+			return o.lang=n,this.keyboard('build');
+		},
+		theme:function(n){
+			var o=this.data('keyboard');
+			return o.theme=n,this.keyboard('_setTheme');
+		},
+		_setTheme:function(){
+			var o=this.data('keyboard');
+			return o.selector?$(o.selector).children('div').removeClass().addClass(o.theme):0,this;
+		},
+		init:function(object){
+			var settings = $.extend({
+										selector:'',
+										lang:'en',
+										theme:'default',
+										maxLetter:1000,
+										displayLetter:17,
+										disabled:{},
+										showDisabled:true,
+										prohibited:['undefined'],
+										currentLetter:1,
+										onClick:function(){},
+										onInit:function(){}
+							},object);this.data('keyboard',settings),$(settings.selector).html('<div></div>'),this.keyboard('build'),
+							this.keyboard('_setTheme'),settings.onInit.call(this,$(this));return this
+		} 
+	}
+	$.fn.keyboard=function(name){
+		return methods[name]?methods[name].apply(this,Array.prototype.slice.call(arguments,1)):typeof name=='object'||!name?methods.init.apply(this,arguments):0
+	}
+})(jQuery);
+
+$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}}})
