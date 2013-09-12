@@ -33,6 +33,10 @@ $.keyboard ={
 			var o=this.data('keyboard');
 			return o.theme=n,this.keyboard('_setTheme');
 		},
+		disable:function(obj){
+			var o=this.data('keyboard');
+			return o.disabled=$.extend(obj,o.disabled),this.keyboard('build');			
+		},
 		_setTheme:function(){
 			var o=this.data('keyboard');
 			return o.selector?$(o.selector).children('div').removeClass().addClass(o.theme):0,this;
