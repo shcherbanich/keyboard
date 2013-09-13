@@ -50,7 +50,11 @@ $.keyboard ={
 		},
 		addLetter:function(l){
 			var o=this.data('keyboard');
-			return o.display.splice(o.caretPosition,0,l),++o.caretPosition,this.keyboard('_setDisplay');
+			return o.display.splice(o.caretPosition++,0,l),this.keyboard('_setDisplay');
+		},
+		delete:function(){
+			var o=this.data('keyboard');
+			return o.display.splice(o.caretPosition,1),this.keyboard('_setDisplay');
 		},
 		caretPosition:function(num){
 			var o=this.data('keyboard'),num=Math.abs(+num),m=o.display.length;
