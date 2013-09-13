@@ -17,7 +17,7 @@ $.keyboard ={
 (function($,undefined){
 	var methods = {
 		build:function(){
-			var o=this.data('keyboard'),display='',key,i=0,name='',d;
+			var o=this.data('keyboard'),display='<div class="display">'+this.keyboard('_getDisplay')+'</div>',key,i=0,name='',d;
 			for(var c in $.keyboard[o.lang])
 				$.keyboard[o.lang][c].forEach(function(b){
 					typeof b == "object"?(key = Object.keys(b),name=b[key]):(key='button',name=b)
@@ -41,12 +41,25 @@ $.keyboard ={
 			return this.data('keyboard').disabled
 		},
 		enable:function(obj){
-			var o=this.data('keyboard'),tmp={};
+			var o=this.data('keyboard'),tmp={},j=0;
 			for(var c in o.disabled)
 				for(var i in o.disabled[c])
-					for(j=0;j<o.disabled[c][i].length;j++)
+					for(j;j<o.disabled[c][i].length;j++)
 						obj[c]&&obj[c][i]&&~obj[c][i].indexOf(o.disabled[c][i][j])?0:(((tmp[c]?0:tmp[c]={}),tmp[c][i]?0:tmp[c][i]=[]),tmp[c][i][j]=o.disabled[c][i][j]);				
 			return o.disabled=tmp,this.keyboard('build');			
+		},
+		display:function(arr){
+			var o=this.data('keyboard');
+			return o.display=arr,this.keyboard('_setDisplay');
+		},
+		_setDisplay:function(){
+			return this.keyboard('_getDisplay'),$(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
+		},
+		_getDisplay:function(){
+			var o=this.data('keyboard'),i=0,display='';
+			for(i;i<o.display.length;i++)
+				(o.caretPosition==i?display+="<div class='caret'>"+o.caretTemplate+"</div>":0),display+="<div class='letter'>"+o.display[i]+"</div>";
+			return display;
 		},
 		_setTheme:function(){
 			var o=this.data('keyboard');
@@ -56,13 +69,16 @@ $.keyboard ={
 			var settings = $.extend({
 										selector:'',
 										lang:'en',
+										display:[],
 										theme:'default',
 										maxLetter:1000,
 										displayLetter:17,
 										disabled:{},
 										showDisabled:true,
 										prohibited:['undefined'],
-										currentLetter:1,
+										showDisplay:['button','number','simbol'],
+										caretPosition:0,
+										caretTemplate:'|',
 										onClick:function(){},
 										onInit:function(){}
 							},object);this.data('keyboard',settings),$(settings.selector).html('<div></div>'),this.keyboard('build'),
@@ -74,4 +90,4 @@ $.keyboard ={
 	}
 })(jQuery);
 
-$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}}})
+$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','tete','w']})
