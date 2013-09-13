@@ -56,6 +56,10 @@ $.keyboard ={
 			var o=this.data('keyboard');
 			return o.display.splice(o.caretPosition,1),this.keyboard('_setDisplay');
 		},
+		backspace:function(){
+			var o=this.data('keyboard');
+			return (--o.caretPosition<0?++o.caretPosition:o.display.splice(o.caretPosition,1)),this.keyboard('_setDisplay');
+		},
 		caretPosition:function(num){
 			var o=this.data('keyboard'),num=Math.abs(+num),m=o.display.length;
 			return (o.caretPosition=num>m?m:num),this.keyboard('_setDisplay');
