@@ -37,6 +37,17 @@ $.keyboard ={
 			var o=this.data('keyboard');
 			return o.disabled=$.extend(obj,o.disabled),this.keyboard('build');			
 		},
+		getDisabled:function(){
+			return this.data('keyboard').disabled
+		},
+		enable:function(obj){
+			var o=this.data('keyboard'),tmp={};
+			for(var c in o.disabled)
+				for(var i in o.disabled[c])
+					for(j=0;j<o.disabled[c][i].length;j++)
+						obj[c]&&obj[c][i]&&~obj[c][i].indexOf(o.disabled[c][i][j])?0:(((tmp[c]?0:tmp[c]={}),tmp[c][i]?0:tmp[c][i]=[]),tmp[c][i][j]=o.disabled[c][i][j]);				
+			return o.disabled=tmp,this.keyboard('build');			
+		},
 		_setTheme:function(){
 			var o=this.data('keyboard');
 			return o.selector?$(o.selector).children('div').removeClass().addClass(o.theme):0,this;
