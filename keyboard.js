@@ -48,6 +48,14 @@ $.keyboard ={
 						obj[c]&&obj[c][i]&&~obj[c][i].indexOf(o.disabled[c][i][j])?0:(((tmp[c]?0:tmp[c]={}),tmp[c][i]?0:tmp[c][i]=[]),tmp[c][i][j]=o.disabled[c][i][j]);				
 			return o.disabled=tmp,this.keyboard('build');			
 		},
+		addLetter:function(l){
+			var o=this.data('keyboard');
+			return o.display.splice(o.caretPosition,0,l),++o.caretPosition,this.keyboard('_setDisplay');
+		},
+		caretPosition:function(num){
+			var o=this.data('keyboard'),num=Math.abs(+num),m=o.display.length;
+			return (o.caretPosition=num>m?m:num),this.keyboard('_setDisplay');
+		},
 		display:function(arr){
 			var o=this.data('keyboard');
 			return o.display=arr,this.keyboard('_setDisplay');
@@ -56,9 +64,9 @@ $.keyboard ={
 			return this.keyboard('_getDisplay'),$(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
 		},
 		_getDisplay:function(){
-			var o=this.data('keyboard'),i=0,display='';
-			for(i;i<o.display.length;i++)
-				(o.caretPosition==i?display+="<div class='caret'>"+o.caretTemplate+"</div>":0),display+="<div class='letter'>"+o.display[i]+"</div>";
+			var o=this.data('keyboard'),i=o.startDisplay,max=i+o.displayLetter,l=o.display.length,display='';max>l?max=l:0;
+			for(i;i<max;i++)
+				(o.caretPosition==i?display+=o.caretTemplate:0),display+="<div class='letter'>"+o.display[i]+"</div>";
 			return display;
 		},
 		_setTheme:function(){
@@ -78,7 +86,8 @@ $.keyboard ={
 										prohibited:['undefined'],
 										showDisplay:['button','number','simbol'],
 										caretPosition:0,
-										caretTemplate:'|',
+										startDisplay:0,
+										caretTemplate:"<div class='caret'>|</div>",
 										onClick:function(){},
 										onInit:function(){}
 							},object);this.data('keyboard',settings),$(settings.selector).html('<div></div>'),this.keyboard('build'),
