@@ -50,7 +50,8 @@ $.keyboard ={
 		},
 		addLetter:function(l){
 			var o=this.data('keyboard');
-			return o.display.splice(o.caretPosition++,0,l),this.keyboard('_setDisplay');
+			o.display.length+1<=o.maxLetter&&!~o.prohibited.indexOf(l)?o.display.splice(o.caretPosition++,0,l):0;
+			return this.keyboard('_setDisplay');
 		},
 		delete:function(){
 			var o=this.data('keyboard');
@@ -58,11 +59,26 @@ $.keyboard ={
 		},
 		backspace:function(){
 			var o=this.data('keyboard');
-			return (--o.caretPosition<0?++o.caretPosition:o.display.splice(o.caretPosition,1)),this.keyboard('_setDisplay');
+			--o.caretPosition<0?++o.caretPosition:o.display.splice(o.caretPosition,1);
+			return this.keyboard('_setDisplay');
 		},
 		caretPosition:function(num){
 			var o=this.data('keyboard'),num=Math.abs(+num),m=o.display.length;
-			return (o.caretPosition=num>m?m:num),this.keyboard('_setDisplay');
+			o.caretPosition=num>m?m:num;
+			return this.keyboard('_setDisplay');
+		},
+		getCaret:function(){
+			return this.data('keyboard').caretPosition;
+		},
+		left:function(){
+			var o=this.data('keyboard');
+			o.caretPosition?--o.caretPosition:0;
+			return this.keyboard('_setDisplay');
+		},
+		right:function(){
+			var o=this.data('keyboard');
+			o.caretPosition<o.display.length?++o.caretPosition:0;
+			return this.keyboard('_setDisplay');
 		},
 		display:function(arr){
 			var o=this.data('keyboard');
@@ -72,9 +88,9 @@ $.keyboard ={
 			return this.keyboard('_getDisplay'),$(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
 		},
 		_getDisplay:function(){
-			var o=this.data('keyboard'),i=o.startDisplay,max=i+o.displayLetter,l=o.display.length,display='';max>l?max=l:0;
-			for(i;i<max;i++)
-				(o.caretPosition==i?display+=o.caretTemplate:0),display+="<div class='letter'>"+o.display[i]+"</div>";
+			var o=this.data('keyboard'),i=o.startDisplay,max=i+o.displayLetter,l=o.display.length,display='',d;max>l?max=l:0;
+			for(i;i<=max;i++)
+				(o.caretPosition==i?display+=o.caretTemplate:0),d=o.display[i],d&&!~o.prohibited.indexOf(d)?display+="<div class='letter'>"+d+"</div>":0;
 			return display;
 		},
 		_setTheme:function(){
@@ -91,11 +107,11 @@ $.keyboard ={
 										displayLetter:17,
 										disabled:{},
 										showDisabled:true,
-										prohibited:['undefined'],
+										prohibited:[],
 										showDisplay:['button','number','simbol'],
 										caretPosition:0,
 										startDisplay:0,
-										caretTemplate:"<div class='caret'>|</div>",
+										caretTemplate:"<div class='letter caret'>|</div>",
 										onClick:function(){},
 										onInit:function(){}
 							},object);this.data('keyboard',settings),$(settings.selector).html('<div></div>'),this.keyboard('build'),
@@ -107,4 +123,4 @@ $.keyboard ={
 	}
 })(jQuery);
 
-$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','tete','w']})
+$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','tete','w','a','c','m','f','y'],prohibited:['a','f']})
