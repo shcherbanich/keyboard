@@ -89,6 +89,17 @@ $.keyboard ={
 		maxLetter:function(n){
 			return this.data('keyboard').maxLetter=+n,this;
 		},
+		getText:function(type){
+			var r;
+			switch(type){
+				case 'array':r = this.data('keyboard').display; break;
+				default :r = this.data('keyboard').display.join(''); break;
+			}
+			return r
+		},
+		enter:function(){
+			return this.val(this.keyboard('getText')),this
+		},
 		selector:function(sel){
 			return this.data('keyboard').selector=sel,$(sel).html('<div></div>'),this.keyboard('build');
 		},
