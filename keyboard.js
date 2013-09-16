@@ -62,6 +62,9 @@ $.keyboard ={
 			--o.caretPosition<0?++o.caretPosition:o.display.splice(o.caretPosition,1);
 			return this.keyboard('_setDisplay');
 		},
+		clear:function(){
+			return this.data('keyboard').display=[],this.keyboard('_setDisplay')
+		},
 		caretPosition:function(num){
 			var o=this.data('keyboard'),num=Math.abs(+num),m=o.display.length;
 			o.caretPosition=num>m?m:num;
@@ -81,8 +84,13 @@ $.keyboard ={
 			return this.keyboard('_setDisplay');
 		},
 		display:function(arr){
-			var o=this.data('keyboard');
-			return o.display=arr,this.keyboard('_setDisplay');
+			return this.data('keyboard').display=arr,this.keyboard('_setDisplay');
+		},
+		maxLetter:function(n){
+			return this.data('keyboard').maxLetter=+n,this;
+		},
+		selector:function(sel){
+			return this.data('keyboard').selector=sel,$(sel).html('<div></div>'),this.keyboard('build');
 		},
 		_setDisplay:function(){
 			return this.keyboard('_getDisplay'),$(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
@@ -112,8 +120,8 @@ $.keyboard ={
 										caretPosition:0,
 										startDisplay:0,
 										caretTemplate:"<div class='letter caret'>|</div>",
-										onClick:function(){},
-										onInit:function(){}
+										onClick:function(self,selector,data){},
+										onInit:function(self){}
 							},object);this.data('keyboard',settings),$(settings.selector).html('<div></div>'),this.keyboard('build'),
 							this.keyboard('_setTheme'),settings.onInit.call(this,$(this));return this
 		} 
@@ -123,4 +131,4 @@ $.keyboard ={
 	}
 })(jQuery);
 
-$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','tete','w','a','c','m','f','y'],prohibited:['a','f']})
+$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','tete','w','a','c','m','f','y'],prohibited:['a','f'],maxLetter:10})
