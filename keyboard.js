@@ -103,6 +103,16 @@ $.keyboard ={
 		selector:function(sel){
 			return this.data('keyboard').selector=sel,$(sel).html('<div></div>'),this.keyboard('build');
 		},
+		changeTextLang:function(pLang,lang){
+			var o=this.data('keyboard'),i=0,t;
+			lang?0:(lang=pLang,pLang=o.lang);
+			if(!$.keyboard[pLang]||!$.keyboard[lang])
+				return this;
+			for(i;i<o.display.length;i++)
+				for(var c in $.keyboard[pLang])
+					t=$.keyboard[pLang][c].indexOf(o.display[i][0]),~t?o.display[i]=[$.keyboard[lang][c][t]]:0;
+			return this.keyboard('_setDisplay');
+		},
 		_setDisplay:function(){
 			return this.keyboard('_getDisplay'),$(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
 		},
@@ -142,4 +152,4 @@ $.keyboard ={
 	}
 })(jQuery);
 
-$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','tete','w','a','c','m','f','y'],prohibited:['a','f'],maxLetter:10})
+$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','п','р','и','в','е','т','!'],prohibited:['a','f'],maxLetter:10})
