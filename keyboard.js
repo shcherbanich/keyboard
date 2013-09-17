@@ -84,7 +84,7 @@ $.keyboard ={
 			return this.keyboard('_setDisplay');
 		},
 		display:function(arr){
-			return this.data('keyboard').display=arr,this.keyboard('_setDisplay');
+			return this.data('keyboard').display=arr,this.keyboard('_removeProhibited').keyboard('_setDisplay');
 		},
 		maxLetter:function(n){
 			return this.data('keyboard').maxLetter=+n,this;
@@ -103,6 +103,20 @@ $.keyboard ={
 		selector:function(sel){
 			return this.data('keyboard').selector=sel,$(sel).html('<div></div>'),this.keyboard('build');
 		},
+		addProhibited:function(el){
+			var o=this.data('keyboard'),i=0;
+			(typeof el=='object')?0:el=[el];
+			for(i;i<el.length;i++)
+				o.prohibited.push(el[i]);
+			return this.keyboard('_removeProhibited').keyboard('_setDisplay');
+		},
+		deleteProhibited:function(el){
+			var o=this.data('keyboard'),t,arr=o.prohibited;o.prohibited=[];
+			(typeof el=='object')?0:el=[el];
+			for(var i in el)
+				t=arr.indexOf(el[i]),~t?delete arr[t]:0;
+			return o.prohibited = arr.sort(),this;
+		},
 		changeTextLang:function(pLang,lang){
 			var o=this.data('keyboard'),i=0,t;
 			lang?0:(lang=pLang,pLang=o.lang);
@@ -110,11 +124,17 @@ $.keyboard ={
 				return this;
 			for(i;i<o.display.length;i++)
 				for(var c in $.keyboard[pLang])
-					t=$.keyboard[pLang][c].indexOf(o.display[i][0]),~t?o.display[i]=[$.keyboard[lang][c][t]]:0;
-			return this.keyboard('_setDisplay');
+					t=$.keyboard[pLang][c].indexOf(o.display[i]),~t?o.display[i]=$.keyboard[lang][c][t]:0;
+			return this.keyboard('_removeProhibited').keyboard('_setDisplay');
+		},
+		_removeProhibited:function(){
+			var o=this.data('keyboard'),i=0,arr=[];
+			for(i;i<o.display.length;i++)
+				~o.prohibited.indexOf(o.display[i])?0:arr.push(o.display[i]);
+			return o.display=arr,this;	
 		},
 		_setDisplay:function(){
-			return this.keyboard('_getDisplay'),$(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
+			return $(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
 		},
 		_getDisplay:function(){
 			var o=this.data('keyboard'),i=o.startDisplay,max=i+o.displayLetter,l=o.display.length,display='',d;max>l?max=l:0;
@@ -152,4 +172,4 @@ $.keyboard ={
 	}
 })(jQuery);
 
-$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','п','р','и','в','е','т','!'],prohibited:['a','f'],maxLetter:10})
+$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','п','р','и','в','е','т','!'],prohibited:['a','f','h','i'],maxLetter:10})
