@@ -50,7 +50,7 @@ $.keyboard ={
 		},
 		addLetter:function(l){
 			var o=this.data('keyboard');
-			o.display.length+1<=o.maxLetter&&!~o.prohibited.indexOf(l)?o.display.splice(o.caretPosition++,0,l):0;
+			o.display.length+1<=o.maxLetter&&!~o.prohibited.indexOf(l.toLowerCase())?o.display.splice(o.caretPosition++,0,o.capsLock?l.toUpperCase():l):0;
 			return this.keyboard('_setDisplay');
 		},
 		delete:function(){
@@ -99,6 +99,10 @@ $.keyboard ={
 		},
 		enter:function(){
 			return this.val(this.keyboard('getText')),this
+		},
+		capsLock:function(){
+			var o=this.data('keyboard');
+			return o.capsLock=!o.capsLock,this;
 		},
 		selector:function(sel){
 			return this.data('keyboard').selector=sel,$(sel).html('<div></div>'),this.keyboard('build');
@@ -166,6 +170,7 @@ $.keyboard ={
 										theme:'default',
 										maxLetter:1000,
 										displayLetter:17,
+										capsLock:false,
 										disabled:{},
 										showDisabled:true,
 										prohibited:[],
