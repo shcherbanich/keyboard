@@ -133,6 +133,18 @@ $.keyboard ={
 				~o.prohibited.indexOf(o.display[i])?0:arr.push(o.display[i]);
 			return o.display=arr,this;	
 		},
+		_setCaretPosition:function(obj){
+			var pos = 0;
+			obj.focus(); 
+			if(obj.selectionStart) 
+				pos = obj.selectionStart; 
+			else if (document.selection) 
+				try{
+					var sel = document.selection.createRange(),clone = sel.duplicate();sel.collapse(true);
+					clone.moveToElementText(obj),clone.setEndPoint('EndToEnd', sel),pos = clone.text.length; 
+				}catch(e){}
+			return this.keyboard('caretPosition',pos);
+		},
 		_setDisplay:function(){
 			return $(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
 		},
@@ -163,13 +175,14 @@ $.keyboard ={
 										caretTemplate:"<div class='letter caret'>|</div>",
 										onClick:function(self,selector,data){},
 										onInit:function(self){}
-							},object);this.data('keyboard',settings),$(settings.selector).html('<div></div>'),this.keyboard('build'),
-							this.keyboard('_setTheme'),settings.onInit.call(this,$(this));return this
+							},object),obj=this;this.data('keyboard',settings),$(settings.selector).html('<div></div>'),this.keyboard('build'),
+							this.keyboard('_setTheme'),settings.onInit.call(this,$(this));settings.display?$(this).val(settings.display.join('')):0;return $(this).click(function(){obj.keyboard('_setCaretPosition',this)})
 		} 
 	}
 	$.fn.keyboard=function(name){
 		return methods[name]?methods[name].apply(this,Array.prototype.slice.call(arguments,1)):typeof name=='object'||!name?methods.init.apply(this,arguments):0
 	}
 })(jQuery);
-
+console.time('start')
 $('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','п','р','и','в','е','т','!'],prohibited:['a','f','h','i'],maxLetter:10})
+console.timeEnd('start')
