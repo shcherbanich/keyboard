@@ -131,6 +131,18 @@ $.keyboard ={
 					t=$.keyboard[pLang][c].indexOf(o.display[i]),~t?o.display[i]=$.keyboard[lang][c][t]:0;
 			return this.keyboard('_removeProhibited').keyboard('_setDisplay');
 		},
+		toLower:function(){
+			var o=this.data('keyboard'),i=0;
+			for(i;i<o.display.length;i++)
+				o.display[i]=o.display[i].toLowerCase();
+			return this.keyboard('_setDisplay');
+		},
+		toUpper:function(){
+			var o=this.data('keyboard'),i=0;
+			for(i;i<o.display.length;i++)
+				o.display[i]=o.display[i].toUpperCase();
+			return this.keyboard('_setDisplay');
+		},
 		_removeProhibited:function(){
 			var o=this.data('keyboard'),i=0,arr=[];
 			for(i;i<o.display.length;i++)
