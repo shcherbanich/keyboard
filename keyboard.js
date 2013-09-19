@@ -26,12 +26,10 @@ $.keyboard ={
 			return $(o.selector).children('div').html(display),this;
 		},
 		lang:function(n){
-			var o=this.data('keyboard');
-			return o.lang=n,this.keyboard('build');
+			return this.data('keyboard').lang=n,this.keyboard('build');
 		},
 		theme:function(n){
-			var o=this.data('keyboard');
-			return o.theme=n,this.keyboard('_setTheme');
+			return this.data('keyboard').theme=n,this.keyboard('_setTheme');
 		},
 		disable:function(obj){
 			var o=this.data('keyboard');
