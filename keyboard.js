@@ -160,6 +160,12 @@ $.keyboard ={
 				return this;		
 			return this.keyboard('caretPosition',o.caretPosition);		
 		},
+		separation:function(num){
+			var o=this.data('keyboard'),arr = o.display[num].split(''),tmp=[],i=0;
+			for(i;i<o.display.length;i++)
+				i==num&&arr.length>1?((tmp=tmp.concat(arr)),o.caretPosition>num?o.caretPosition+=arr.length:0):tmp.push(o.display[i])
+			return o.display=tmp,this.keyboard('caretPosition',--o.caretPosition);
+		},
 		_removeProhibited:function(){
 			var o=this.data('keyboard'),i=0,arr=[];
 			for(i;i<o.display.length;i++)
