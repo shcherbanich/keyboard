@@ -51,6 +51,12 @@ $.keyboard ={
 			o.display.length+1<=o.maxLetter&&!~o.prohibited.indexOf(l.toLowerCase())?o.display.splice(o.caretPosition++,0,o.capsLock?l.toUpperCase():l):0;
 			return this.keyboard('_setDisplay');
 		},
+		deleteLetter:function(l){
+			var o=this.data('keyboard'),i=0;
+			for(i;i<o.display.length;i++)
+				o.display[i]==l?delete o.display[i]:0;
+			return o.display=o.display.sort(),this.keyboard('caretPosition',o.caretPosition);
+		},
 		delete:function(){
 			var o=this.data('keyboard');
 			return o.display.splice(o.caretPosition,1),this.keyboard('_setDisplay');
@@ -87,10 +93,11 @@ $.keyboard ={
 		maxLetter:function(n){
 			return this.data('keyboard').maxLetter=+n,this;
 		},
-		getText:function(type){
+		getText:function(type,s){
 			var r;
 			switch(type){
 				case 'array':r = this.data('keyboard').display; break;
+				case 'implode':r = this.data('keyboard').display.join(s); break;
 				default :r = this.data('keyboard').display.join(''); break;
 			}
 			return r
@@ -141,6 +148,18 @@ $.keyboard ={
 				o.display[i]=o.display[i].toUpperCase();
 			return this.keyboard('_setDisplay');
 		},
+		merge:function(start,end){
+			var o=this.data('keyboard'),l=o.display.length;
+			!end&&!start?(start=0,end=l-1):((start<0?start=0:0),end>l?end=l-1:0);
+			if(start<end){
+				for(var i=start+1;i<=end;i++)
+					(o.display[start]+=''+o.display[i]);
+				o.display.splice(++start,++end-start);
+			}
+			else
+				return this;		
+			return this.keyboard('caretPosition',o.caretPosition);		
+		},
 		_removeProhibited:function(){
 			var o=this.data('keyboard'),i=0,arr=[];
 			for(i;i<o.display.length;i++)
@@ -187,6 +206,8 @@ $.keyboard ={
 										showDisplay:['button','number','simbol'],
 										caretPosition:0,
 										startDisplay:0,
+										useMask:true,
+										mask:"+7(###)###-##-##",
 										caretTemplate:"<div class='letter caret'>|</div>",
 										onClick:function(self,selector,data){},
 										onInit:function(self){}
