@@ -94,11 +94,14 @@ $.keyboard ={
 			return this.data('keyboard').maxLetter=+n,this;
 		},
 		getText:function(type,s){
-			var r;
+			var o=this.data('keyboard'),r,display=[],i=j=0;
+			if(o.enterMask&&o.useMask)
+				for(i;i<o.mask.length;i++)
+					display.push(o.mask[i]!='#'?o.mask[i]:o.display[j++]);
 			switch(type){
-				case 'array':r = this.data('keyboard').display; break;
-				case 'implode':r = this.data('keyboard').display.join(s); break;
-				default :r = this.data('keyboard').display.join(''); break;
+				case 'array':r = display; break;
+				case 'implode':r = display.join(s); break;
+				default :r = display.join(''); break;
 			}
 			return r
 		},
@@ -181,16 +184,22 @@ $.keyboard ={
 				try{
 					var sel = document.selection.createRange(),clone = sel.duplicate();sel.collapse(true);
 					clone.moveToElementText(obj),clone.setEndPoint('EndToEnd', sel),pos = clone.text.length; 
-				}catch(e){}
+				}catch(e){
+					pos=0;
+				}
 			return this.keyboard('caretPosition',pos);
 		},
 		_setDisplay:function(){
 			return $(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
 		},
 		_getDisplay:function(){
-			var o=this.data('keyboard'),i=o.startDisplay,max=i+o.displayLetter,l=o.display.length,display='',d;max>l?max=l:0;
-			for(i;i<=max;i++)
-				(o.caretPosition==i?display+=o.caretTemplate:0),d=o.display[i],d&&!~o.prohibited.indexOf(d)?display+="<div class='letter'>"+d+"</div>":0;
+			var o=this.data('keyboard'),i=j=o.startDisplay,max=i+o.displayLetter,l=o.display.length,display='',d;max>l?max=l:0;
+			if(o.useMask)	
+				for(i=0;i<o.mask.length;i++)
+					o.mask[i]!='#'?display+="<div class='letter mask'>"+o.mask[i]+"</div>":((o.caretPosition==j?display+=o.caretTemplate:0),d=o.display[j++],d?(!~o.prohibited.indexOf(d)?display+="<div class='letter'>"+d+"</div>":--i):display+="<div class='letter maskSpace'>_</div>");
+			else
+				for(i;i<=max;i++)
+					(o.caretPosition==i?display+=o.caretTemplate:0),d=o.display[i],d&&!~o.prohibited.indexOf(d)?display+="<div class='letter'>"+d+"</div>":0;
 			return display;
 		},
 		_setTheme:function(){
@@ -213,6 +222,7 @@ $.keyboard ={
 										caretPosition:0,
 										startDisplay:0,
 										useMask:true,
+										enterMask:true,
 										mask:"+7(###)###-##-##",
 										caretTemplate:"<div class='letter caret'>|</div>",
 										onClick:function(self,selector,data){},
