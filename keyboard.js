@@ -47,9 +47,9 @@ $.keyboard ={
 			return o.disabled=tmp,this.keyboard('build');			
 		},
 		addLetter:function(l){
-			var o=this.data('keyboard');
-			o.display.length+1<=o.maxLetter&&!~o.prohibited.indexOf(l.toLowerCase())?o.display.splice(o.caretPosition++,0,o.capsLock?l.toUpperCase():l):0;
-			return this.keyboard('_setDisplay');
+			var o=this.data('keyboard'),c=o.caretPosition;
+			o.display.length+1<=o.maxLetter&&!~o.prohibited.indexOf(l.toLowerCase())?o.display.splice(c++,0,o.capsLock?l.toUpperCase():l):0;
+			return this.keyboard('caretPosition',c);
 		},
 		deleteLetter:function(l){
 			var o=this.data('keyboard'),i=0;
@@ -58,34 +58,34 @@ $.keyboard ={
 			return o.display=o.display.sort(),this.keyboard('caretPosition',o.caretPosition);
 		},
 		delete:function(){
-			var o=this.data('keyboard');
-			return o.display.splice(o.caretPosition,1),this.keyboard('_setDisplay');
+			var o=this.data('keyboard'),c=o.caretPosition;
+			return o.display.splice(c,1),this.keyboard('caretPosition',c);
 		},
 		backspace:function(){
-			var o=this.data('keyboard');
-			--o.caretPosition<0?++o.caretPosition:o.display.splice(o.caretPosition,1);
-			return this.keyboard('_setDisplay');
+			var o=this.data('keyboard'),c=o.caretPosition;
+			--c<0?++c:o.display.splice(c,1);
+			return this.keyboard('caretPosition',c);
 		},
 		clear:function(){
 			return this.data('keyboard').display=[],this.keyboard('_setDisplay')
 		},
 		caretPosition:function(num){
-			var o=this.data('keyboard'),num=Math.abs(+num),m=o.display.length;
-			o.caretPosition=num>m?m:num;
+			var o=this.data('keyboard'),num=Math.abs(+num),m=o.display.length,c=this.keyboard('_realCaretPosition'),l=o.displayLetter,s=o.startDisplay,r;
+			o.caretPosition=num>m?m:num;o.startDisplay=(r=++c-l,c<s+l?(s>c-1?s:(r>=0?r:0)):r)
 			return this.keyboard('_setDisplay');
 		},
 		getCaret:function(){
 			return this.data('keyboard').caretPosition;
 		},
 		left:function(){
-			var o=this.data('keyboard');
-			o.caretPosition?--o.caretPosition:0;
-			return this.keyboard('_setDisplay');
+			var o=this.data('keyboard'),c=o.caretPosition;
+			c?--c:0;
+			return this.keyboard('caretPosition',c);
 		},
 		right:function(){
-			var o=this.data('keyboard');
-			o.caretPosition<o.display.length?++o.caretPosition:0;
-			return this.keyboard('_setDisplay');
+			var o=this.data('keyboard'),c=o.caretPosition;
+			c<o.display.length?++c:0;
+			return this.keyboard('caretPosition',c);
 		},
 		display:function(arr){
 			return this.data('keyboard').display=arr,this.keyboard('_removeProhibited').keyboard('_setDisplay');
@@ -95,9 +95,11 @@ $.keyboard ={
 		},
 		getText:function(type,s){
 			var o=this.data('keyboard'),r,display=[],i=j=0;
-			if(o.enterMask&&o.useMask)
-				for(i;i<o.mask.length;i++)
-					display.push(o.mask[i]!='#'?o.mask[i]:o.display[j++]);
+			if(o.mask.enter&&o.mask.use)
+				for(i;i<o.mask.tpl.length;i++)
+					display.push(o.mask.tpl[i]&&o.mask.tpl[i]!='#'?o.mask.tpl[i]:o.display[j++]);
+			else
+				display=o.display;
 			switch(type){
 				case 'array':r = display; break;
 				case 'implode':r = display.join(s); break;
@@ -164,10 +166,25 @@ $.keyboard ={
 			return this.keyboard('caretPosition',o.caretPosition);		
 		},
 		separation:function(num){
-			var o=this.data('keyboard'),arr = o.display[num].split(''),tmp=[],i=0;
+			var o=this.data('keyboard'),arr = o.display[num].split(''),tmp=[],i=0,c=o.caretPosition;
 			for(i;i<o.display.length;i++)
-				i==num&&arr.length>1?((tmp=tmp.concat(arr)),o.caretPosition>num?o.caretPosition+=arr.length:0):tmp.push(o.display[i])
-			return o.display=tmp,this.keyboard('caretPosition',--o.caretPosition);
+				i==num&&arr.length>1?((tmp=tmp.concat(arr)),c>num?c+=arr.length:0):tmp.push(o.display[i])
+			return o.display=tmp,this.keyboard('caretPosition',c);
+		},
+		_realCaretPosition:function(){
+			var o=this.data('keyboard'),arr=[],i=0,j=o.startDisplay,pos,e=o.display.length;  /*?*/
+			if(o.mask.use){	
+				for(i;i<=o.display.length;i++){
+					console.log(o.mask.tpl[i],o.mask.tpl[i]=='#')
+					if(o.mask.tpl[i]=='#'&&o.caretPosition==j++){
+						pos=++i;
+					}
+				}
+			}
+			else
+				pos=o.caretPosition;
+			console.log(pos);
+			return pos;				
 		},
 		_removeProhibited:function(){
 			var o=this.data('keyboard'),i=0,arr=[];
@@ -193,10 +210,10 @@ $.keyboard ={
 			return $(this.data('keyboard').selector).find('.display').html(this.keyboard('_getDisplay')),this;
 		},
 		_getDisplay:function(){
-			var o=this.data('keyboard'),i=j=o.startDisplay,max=i+o.displayLetter,l=o.display.length,display='',d;max>l?max=l:0;
-			if(o.useMask)	
-				for(i=0;i<o.mask.length;i++)
-					o.mask[i]!='#'?display+="<div class='letter mask'>"+o.mask[i]+"</div>":((o.caretPosition==j?display+=o.caretTemplate:0),d=o.display[j++],d?(!~o.prohibited.indexOf(d)?display+="<div class='letter'>"+d+"</div>":--i):display+="<div class='letter maskSpace'>_</div>");
+			var o=this.data('keyboard'),i=j=o.startDisplay,e=i+o.displayLetter,max=i+o.displayLetter,l=o.display.length,display='',d;max>l?max=l:0;
+			if(o.mask.use)	
+				for(i;i<e;i++)
+					o.mask.tpl[i]!='#'?display+="<div class='letter mask'>"+o.mask.tpl[i]+"</div>":((o.caretPosition==j?display+=o.caretTemplate:0),d=o.display[j++],d?(!~o.prohibited.indexOf(d)?display+="<div class='letter'>"+d+"</div>":--i):display+="<div class='letter maskSpace'>_</div>");
 			else
 				for(i;i<=max;i++)
 					(o.caretPosition==i?display+=o.caretTemplate:0),d=o.display[i],d&&!~o.prohibited.indexOf(d)?display+="<div class='letter'>"+d+"</div>":0;
@@ -221,9 +238,12 @@ $.keyboard ={
 										showDisplay:['button','number','simbol'],
 										caretPosition:0,
 										startDisplay:0,
-										useMask:true,
-										enterMask:true,
-										mask:"+7(###)###-##-##",
+										mask:{
+												use:true,
+												enter:true,
+												number:9,
+												tpl:"+7(###)###-##-##"
+										},
 										caretTemplate:"<div class='letter caret'>|</div>",
 										onClick:function(self,selector,data){},
 										onInit:function(self){}
@@ -236,5 +256,5 @@ $.keyboard ={
 	}
 })(jQuery);
 console.time('start')
-$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','п','р','и','в','е','т','!'],prohibited:['a','f','h','i'],maxLetter:10})
+$('input').keyboard({selector:'.for-cards',lang:'en',disabled:{en:{1:[2,3,8,0],2:[6,3]}},display:['3','п','р','и','в','е','т','!'],prohibited:['a','f','h','i'],displayLetter:5})
 console.timeEnd('start')
