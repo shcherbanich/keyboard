@@ -172,18 +172,22 @@ $.keyboard ={
 			return o.display=tmp,this.keyboard('caretPosition',c);
 		},
 		_realCaretPosition:function(){
-			var o=this.data('keyboard'),arr=[],i=0,j=o.startDisplay,pos,e=o.display.length;  /*?*/
+			var o=this.data('keyboard'),n=i=j=0,e=i+o.displayLetter,pos=0;/*?*/
 			if(o.mask.use){	
-				for(i;i<=o.display.length;i++){
-					console.log(o.mask.tpl[i],o.mask.tpl[i]=='#')
-					if(o.mask.tpl[i]=='#'&&o.caretPosition==j++){
-						pos=++i;
+				for(i;i<o.mask.tpl.length;i++){
+					if(o.mask.tpl[i]!='#'){
+						++n;
+					}
+					else if(o.caretPosition==j++){
+						pos = n+o.caretPosition;
+						console.log('поз: '+pos,n,o.caretPosition)
+						break;
 					}
 				}
 			}
 			else
 				pos=o.caretPosition;
-			console.log(pos);
+				console.log(pos)
 			return pos;				
 		},
 		_removeProhibited:function(){
